@@ -1,0 +1,3 @@
+This data has been downloaded from https://www.kaggle.com/datasets/kannanaikkal/food-demand-forecasting
+Thus, it is distributed under Database Content License (DbCL) v1.0 http://opendatacommons.org/licenses/dbcl/1.0/
+

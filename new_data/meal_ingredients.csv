@@ -1,0 +1,305 @@
+meal_id,ingredient,weight_grams
+1885,Red syrup,50
+1885,Milk,30
+1885,Sugar,20
+1885,Salt,1
+1885,Ice,100
+1993,Coconut Water,250
+1993,Ice,100
+2539,Tea Leaves,10
+2539,Water,250
+2539,Milk,50
+2539,Sugar,20
+2539,Ice,100
+1311,Chicken,600
+1311,Coconut Milk,200
+1311,Desiccated Coconut,100
+1311,Panko Breadcrumbs,100
+1311,Egg,50
+1311,Red Curry Paste,20
+1311,Olive Oil,20
+1311,Salt,5
+1311,Pepper,5
+1311,Lime,4
+1803,Beef,1000
+1803,Carrots,200
+1803,Potatoes,200
+1803,Onion,100
+1803,Lemongrass,3
+1803,Ginger,20
+1803,Soy Sauce,20
+1803,Fish Sauce,10
+1803,Sugar,5
+1803,Star Anise,3
+1803,Rice Noodles,150
+1198,Chicken,500
+1198,Onion,50
+1198,Cilantro,20
+1198,Basil,20
+1198,Ginger,10
+1198,Green Curry,10
+1198,Soy Sauce,10
+1198,Salt,5
+1198,Pepper,5
+1198,Wheat Hamburger Buns,4
+1198,Red Bell Pepper,100
+1198,Cucumber,100
+1198,Mayonnaise,60
+1198,Lime,10
+1847,Chicken,700
+1847,Coconut Milk,400
+1847,Green Curry,30
+1847,Bell peppers,200
+1847,Bamboo Shoots,100
+1847,Sugar,10
+1847,Fish Sauce,10
+1847,Lime Leaves,5
+1847,Basil Leaves,5
+1847,Salt,5
+1438,Chicken,500
+1438,Onion,100
+1438,Garlic,10
+1438,Ginger,10
+1438,Sweet Potatoes,300
+1438,Carrots,200
+1438,Celery,100
+1438,Chicken,1000
+1438,Thyme Leaves,5
+1438,Salt,5
+1438,Pepper,5
+2494,Prawns,300
+2494,Chicken,500
+2494,Lemongrass Stalks,3
+2494,Galangal,20
+2494,Kaffir Lime Leaves,5
+2494,Bird's Eye Chili Peppers,3
+2494,Mushrooms,100
+2494,Fish Sauce,20
+2494,Lime Juice,20
+2494,Sugar,5
+2494,Salt,5
+1525,Pork Belly,200
+1525,Rice Crackers,100
+1525,Cilantro Leaves,10
+1525,Salt,5
+1525,Pepper,5
+2704,Nori Sheets,10
+2704,Olive Oil,10
+2704,Salt,5
+2760,Peanuts,100
+2760,Coconut,100
+2760,Egg,100
+2760,Sugar,10
+2760,Salt,5
+1878,Chicken,300
+1878,Lettuce Leaves,100
+1878,Carrots,50
+1878,Cucumber,50
+1878,Green Onion,20
+1878,Hoisin Sauce,30
+1878,Soy Sauce,15
+1878,Lime,50
+2640,Rice Paper Wrappers,10
+2640,Shrimp,100
+2640,Rice Noodles,50
+2640,Carrots,50
+2640,Cucumber,50
+2640,Bean Sprouts,50
+2577,Corn Kernels,200
+2577,Flour,75
+2577,Egg,100
+2577,Coconut Milk,50
+2577,Green Onion,20
+2577,Salt,5
+2577,Pepper,5
+1248,Water,500
+1248,Tea Leaves,10
+1248,Ginger,10
+1248,Cinnamon,5
+1248,Cardamom Pods,5
+1248,Cloves,5
+1248,Milk,200
+1248,Sugar,30
+2631,Yogurt,200
+2631,Milk,100
+2631,Sugar,20
+2631,Rose Water,5
+2139,Mango,500
+2139,Sugar,100
+2139,Cumin Powder,5
+2139,Salt,5
+2139,Mint Leaves,10
+1109,Chicken,200
+1109,White Rice,150
+1109,Red Bell Pepper,50
+1109,Cucumber,50
+1109,Carrot,50
+1109,Onion,20
+1109,Soy Sauce,15
+1109,Honey,10
+2290,Salmon,200
+2290,White Rice,150
+2290,Avocado,50
+2290,Cucumber,50
+2290,Carrot,50
+2290,Onion,20
+2290,Soy Sauce,15
+2290,Lemon Juice,10
+1727,Tofu,150
+1727,White Rice,150
+1727,Red Bell Pepper,50
+1727,Cucumber,50
+1727,Carrot,50
+1727,Onion,20
+1727,Soy Sauce,15
+1727,Honey,10
+1902,Rice,200
+1902,Chicken,200
+1902,Yogurt,50
+1902,Tomato,50
+1902,Onion,50
+1902,Ginger,10
+1902,Garlic,10
+1902,Red Chili Powder,5
+1902,Garam Masala,5
+1902,Mint Leaves,10
+1902,Cilantro Leaves,10
+1247,Rice,200
+1247,Beef,200
+1247,Yogurt,50
+1247,Tomato,50
+1247,Onion,50
+1247,Ginger,10
+1247,Garlic,10
+1247,Red Chili Powder,5
+1247,Garam Masala,5
+1247,Mint Leaves,10
+1247,Cilantro Leaves,10
+1770,Rice,200
+1770,Chicken,200
+1770,Yogurt,50
+1770,Tomato,50
+1770,Onion,50
+1770,Ginger,10
+1770,Garlic,10
+1770,Red Chili Powder,5
+1770,Garam Masala,5
+1770,Mint Leaves,10
+1770,Cilantro Leaves,10
+2304,Carrots,500
+2304,Milk,500
+2304,Sugar,150
+2304,Butter,50
+2304,Cardamom Pods,5
+1543,Mango Pulp,500
+1543,Semolina,50
+1543,Sugar,150
+1543,Butter,50
+1543,Cardamom Powder,5
+2492,Bread Slices,4
+2492,Milk,500
+2492,Sugar,150
+2492,Butter,50
+2492,Cardamom Powder,5
+2492,Almonds,10
+1062,San Pellegrino Orange Juice,300
+1778,Lemon Juice,50
+1778,Sugar,50
+1778,Sparkling Water,300
+2707,Sparkling Water,500
+2490,Fennel,200
+2490,Oranges,300
+2490,Red Onion,50
+2490,Extra-Virgin Olive Oil,30
+2490,Salt,5
+2664,Chicken,400
+2664,Mayonnaise,100
+2664,Celery,50
+2664,Onion,50
+2664,Mustard,10
+2664,Pepper,5
+2664,Salt,5
+2569,Lettuce,300
+2569,Croutons,50
+2569,Parmesan Cheese,100
+2569,Worcestershire Sauce,5
+2569,Salt,5
+2569,Pepper,5
+2569,Wine Vinegar,5
+2569,Garlic,10
+2569,Egg,100
+2569,Lemon,50
+2569,Extra-Virgin Olive Oil,10
+1754,White Bread,100
+1754,Smoked Ham,50
+1754,Mayonnaise,50
+1754,Hard-Boiled Eggs,50
+1754,Lettuce,30
+1971,Lampredotto,300
+1971,Bread,100
+1971,Green Sauce,50
+2826,Porchetta,300
+2826,Bread,100
+2826,Arugula,30
+2826,Mayonnaise,10
+2306,Pasta,100
+2306,Basil Pesto,50
+2306,Parmesan Cheese,20
+2306,Pine Nuts,20
+2306,Garlic,10
+1216,Pasta,100
+1216,Tomatoes,200
+1216,Garlic,10
+1216,Red Pepper Flakes,5
+2126,Pasta,100
+2126,Pancetta,50
+2126,Egg,120
+2126,Cheese,30
+1230,Cola,200
+1207,Water,200
+2322,Sprite,200
+1558,Flour,500
+1558,Water,300
+1558,Yeast,10
+1558,Tomato,300
+1558,Cheese,200
+1558,Basil Leaves,5
+1558,Extra-Virgin Olive Oil,10
+2581,Flour,500
+2581,Water,300
+2581,Yeast,10
+2581,Tomato,300
+2581,Cheese,200
+2581,Mushrooms,50
+2581,Extra-Virgin Olive Oil,10
+1962,Flour,500
+1962,Water,300
+1962,Yeast,10
+1962,Tomato,300
+1962,Cheese,200
+1962,Salami,50
+1962,Extra-Virgin Olive Oil,10
+1571,Sole,200
+1571,Butter,20
+1571,Lemon,50
+1571,Flour,10
+2956,Flounder,200
+2956,Butter,20
+2956,Lemon,50
+2956,Flour,10
+2104,Tuna,200
+2104,Olive Oil,20
+2104,Lemon,50
+2104,Salt,5
+2444,Shrimp,200
+2444,Butter,50
+2444,Garlic,10
+2444,Parsley,5
+2867,Salmon,200
+2867,Mango,50
+2867,Red Onion,20
+2867,Cilantro,5
+1445,Shrimp,200
+1445,Tortillas,100
+1445,Avocado,50
+1445,Sour Cream,20

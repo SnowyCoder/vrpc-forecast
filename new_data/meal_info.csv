@@ -1,0 +1,52 @@
+meal_id,category,cuisine,name
+1885,Beverages,Thai,Nom Yen
+1993,Beverages,Thai,Coconut Water
+2539,Beverages,Thai,Milk Tea
+1311,Extras,Thai,Thai coconut crumbed chicken traybake
+1803,Extras,Thai,Lemongrass beef stew with noodles
+1198,Extras,Thai,Skinny Thai burgers
+1847,Soup,Thai,Green Chicken Curry
+1438,Soup,Thai,Chicken and Sweet Potato Soup
+2494,Soup,Thai,Tom Yum Soup with Prawns
+1525,Other Snacks,Thai,Rice Cracker with Pork
+2704,Other Snacks,Thai,Nori Chips
+2760,Other Snacks,Thai,Coconut Coated Peanuts
+1878,Starters,Thai,Chicken Lettuce Wraps
+2640,Starters,Thai,Fresh Spring Rolls
+2577,Starters,Thai,Corn Fritters
+1248,Beverages,Indian,Masala Chai
+2631,Beverages,Indian,Lassi
+2139,Beverages,Indian,Aam Panna
+1109,Rice Bowl,Indian,Chicken Rice Bowl
+2290,Rice Bowl,Indian,Salmon Rice Bowl
+1727,Rice Bowl,Indian,Vegetarian Rice Bowl
+1902,Biryani,Indian,Ambur Biryani
+1247,Biryani,Indian,Beef Biryani
+1770,Biryani,Indian,Delhi Biryani
+2304,Dessert,Indian,Carrot Pudding
+1543,Dessert,Indian,Mango Halwa
+2492,Dessert,Indian,Shahi Tukra
+1062,Beverages,Italian,San Pellegrino Orange Juice
+1778,Beverages,Italian,Gazzosa
+2707,Beverages,Italian,Sprinkling Water
+2490,Salad,Italian,Fennel and Orange Salad
+2664,Salad,Italian,Chicken Salad
+2569,Salad,Italian,Caesar Salad
+1754,Sandwich,Italian,Tramezzino
+1971,Sandwich,Italian,Panino al Lampredotto
+2826,Sandwich,Italian,Panino con la Porchetta
+2306,Pasta,Italian,Pasta al Pesto
+1216,Pasta,Italian,Pasta all'Arrabbiata
+2126,Pasta,Italian,Pasta alla Carbonara
+1230,Beverages,Continental,Cola
+1207,Beverages,Continental,Water
+2322,Beverages,Continental,Sprite
+1558,Pizza,Continental,Margherita Pizza
+2581,Pizza,Continental,Mushroom Pizza
+1962,Pizza,Continental,Salami Pizza
+1571,Fish,Continental,Sole
+2956,Fish,Continental,Flounder
+2104,Fish,Continental,Tuna
+2444,Seafood,Continental,Garlic Butter Shrimp Scampi
+2867,Seafood,Continental,Grilled Salmon with Mango Salsa
+1445,Seafood,Continental,Spicy Shrimp Tacos with Avocado Cream

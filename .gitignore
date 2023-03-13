@@ -1,0 +1,9 @@
+# Intellij IDEs
+.idea
+
+# Python
+.venv/
+src/**/__pycache__
+
+# Custom project data
+out/
