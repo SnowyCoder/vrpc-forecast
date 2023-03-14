@@ -4,8 +4,6 @@ from gurobipy import Model
 import heapq
 from math import inf
 
-DISTANCE_GRANULARITY = 100
-
 
 # Colgen problem data
 class CGProblemData(NamedTuple):
@@ -75,7 +73,7 @@ class Node:
                     continue
 
                 index_j = index_default(route.path, j, 0)
-                if index_j > 0 and route.path[index_i - 1] != i:
+                if index_j > 0 and route.path[index_j - 1] != i:
                     remove_route(route)
         else:
             # We should remove every path with the arc (i, j) present
@@ -126,6 +124,8 @@ class Context:
         self.next_route_id = 0
 
         self.routes = {}
+        self.root = None
+        self.best_sol = None
 
     def push(self, n: Node):
         heapq.heappush(self.to_explore, (n.model.objVal, n))

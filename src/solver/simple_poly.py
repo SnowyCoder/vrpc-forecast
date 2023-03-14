@@ -1,5 +1,7 @@
-from .common import ProblemData, points_to_distance_matrix, MAX_CAPACITY_PER_VEHICLE, MAX_VEHICLES
+from .common import ProblemData, points_to_distance_matrix, MAX_CAPACITY_PER_VEHICLE, MAX_VEHICLES, GRANULARITY, DISTANCE_GRANULARITY
 from gurobipy import Model, GRB, quicksum as qsum
+import numpy as np
+from math import ceil, floor
 
 
 def solve_flow_poly(data: ProblemData, subproblem: int | None):
@@ -11,9 +13,10 @@ def solve_flow_poly(data: ProblemData, subproblem: int | None):
     d = points_to_distance_matrix(
         [data.distribution_center] + [p.location for p in facilities]
     )
-    print(repr(d))
-    print(MAX_CAPACITY_PER_VEHICLE, [f.material for f in facilities])
-    w = [0.] + [f.material for f in facilities]
+    d = np.ceil(DISTANCE_GRANULARITY * d)
+
+    w = [0] + [ceil(f.material / GRANULARITY) for f in facilities]
+    max_cap = floor(MAX_CAPACITY_PER_VEHICLE / GRANULARITY)
 
     V = range(len(facilities) + 1)
     W = [(i, j) for i in V for j in V if i != j]
@@ -48,7 +51,7 @@ def solve_flow_poly(data: ProblemData, subproblem: int | None):
     # | c[j] - c[i] >= w[j] - M
     M = 2*sum(w)
     m.addConstrs(c[j] - c[i] >= w[j] - M*(1-x[i, j]) for i in V for j in V if i != j and j != 0)
-    m.addConstrs(c[i] <= MAX_CAPACITY_PER_VEHICLE for i in V)
+    m.addConstrs(c[i] <= max_cap for i in V)
 
     m.optimize()
 
@@ -61,7 +64,7 @@ def solve_flow_poly(data: ProblemData, subproblem: int | None):
         return path
 
     if m.status == GRB.Status.OPTIMAL:
-        print(f"Problem solved, cost: {m.objVal}")
+        print(f"Problem solved, cost: {m.objVal / DISTANCE_GRANULARITY}")
         print([i.x for i in c])
         start_paths = next_nodes(0)
         print(f"Paths: {len(start_paths)}")

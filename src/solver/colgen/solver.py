@@ -1,7 +1,6 @@
 from .optimize import derive_clients_count, optimize_problem
-from ..common import ProblemData, points_to_distance_matrix, MAX_CAPACITY_PER_VEHICLE, GRANULARITY
-from .data import DISTANCE_GRANULARITY, CGProblemData, Route
-from .data import Context
+from ..common import ProblemData, points_to_distance_matrix, MAX_CAPACITY_PER_VEHICLE, GRANULARITY, DISTANCE_GRANULARITY
+from .data import Context, CGProblemData, Route
 from .branchnprice import branchnprice, debug_explore
 
 from gurobipy import Model, quicksum as qsum, GRB
@@ -125,11 +124,12 @@ def solve_colgen(data: ProblemData, subproblem: int | None, debug: bool=False):
 
     # Remove relaxations and optimally solve the problem.
     branchnprice(ctx, m)
+    if ctx.best_sol is None:
+        print("No feasible solution found, should be impossible")
+    else:
+        m = ctx.best_sol.model
 
-    m = ctx.best_sol.model
-
-    x = m.getVars()[2:]
-    if m.status == GRB.Status.OPTIMAL:
+        x = m.getVars()[2:]
         print(ctx.best_sol.history)
         print(f"Problem solved, cost: {m.objVal / DISTANCE_GRANULARITY}")
         print(f"Paths:")
@@ -137,8 +137,5 @@ def solve_colgen(data: ProblemData, subproblem: int | None, debug: bool=False):
             if v.x > 0.00001:
                 print(v.x, ctx.routes[v.VarName].path, v.VarName)
 
-        if debug:
-            debug_explore(ctx)
-
-    else:
-        print("No feasible solution found")
+    if debug:
+        debug_explore(ctx)

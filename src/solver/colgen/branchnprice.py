@@ -29,11 +29,13 @@ def debug_explore(ctx: Context):
         print(f'Depth: {len(path)-1}')
         for i, n in enumerate(current.children):
             print(f'{i}: {n.history}')
-        print("Routes:")
-        for x in current.model.getVars()[2:]:
-            if x.x > 0.001:
-                route = ctx.routes[x.VarName]
-                print(x.x, route.path, route.cost, route.has_cycles)
+
+        if current.model.status == GRB.OPTIMAL:
+            print("Routes:")
+            for x in current.model.getVars()[2:]:
+                if x.x > 0.001:
+                    route = ctx.routes[x.VarName]
+                    print(x.x, route.path, route.cost, route.has_cycles)
 
         while True:
             try:

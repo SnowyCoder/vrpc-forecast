@@ -8,7 +8,9 @@ MAX_CAPACITY_PER_VEHICLE = 50_000  # In Kilograms
 # If a customer should receive 137 Kg and we use a granularity of 100 we round it up to 200Kg
 # This is only useful for the column generator method because the subproblem complexity depends
 # quadratically on the maximum capacity, so by increasing the "grain size" we can improve performance by a lot
+# To be fair we impose these restrictions in all the algorithms
 GRANULARITY = 1000  # In Kilograms per customer
+DISTANCE_GRANULARITY = 100  # How many precision digits should we compute
 MAX_VEHICLES = 20
 
 

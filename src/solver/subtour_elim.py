@@ -1,6 +1,8 @@
-from .common import ProblemData, points_to_distance_matrix, MAX_CAPACITY_PER_VEHICLE, MAX_VEHICLES
+from .common import ProblemData, points_to_distance_matrix, MAX_CAPACITY_PER_VEHICLE, MAX_VEHICLES, GRANULARITY, DISTANCE_GRANULARITY
 from gurobipy import Model, quicksum as qsum, GRB, Var
 from typing import Dict, Tuple, List
+from math import floor, ceil
+import numpy as np
 
 
 def find_subtour(next: List[int]) -> List[List[int]]:
@@ -61,8 +63,11 @@ def solve_subtour_elim(data: ProblemData, subproblem: int | None):
     c = points_to_distance_matrix(
         [data.distribution_center] + [p.location for p in facilities] + [data.distribution_center]
     )
+    c = np.ceil(DISTANCE_GRANULARITY * c)
+
     # Demand
-    d = [0.] + [f.material for f in facilities]
+    d = [0] + [ceil(f.material / GRANULARITY) for f in facilities]
+    max_cap = floor(MAX_CAPACITY_PER_VEHICLE / GRANULARITY)
 
     V = range(len(facilities) + 2)
     C = range(1, len(facilities) + 1)
@@ -84,7 +89,7 @@ def solve_subtour_elim(data: ProblemData, subproblem: int | None):
     m.addConstrs(qsum(x[i, j, k] for j in V for k in K) == 1 for i in C)
 
     # Vehicle capacity
-    m.addConstrs(qsum(d[i] * qsum(x[i, j, k] for j in V) for i in C) <= MAX_CAPACITY_PER_VEHICLE for k in K)
+    m.addConstrs(qsum(d[i] * qsum(x[i, j, k] for j in V) for i in C) <= max_cap for k in K)
 
     # ~~~ Flow bounds ~~~
     # Every node should have exactly one entry path and one exit path
@@ -110,7 +115,7 @@ def solve_subtour_elim(data: ProblemData, subproblem: int | None):
         return path
 
     if m.status == GRB.Status.OPTIMAL:
-        print(f"Problem solved, cost: {m.objVal}")
+        print(f"Problem solved, cost: {m.objVal / DISTANCE_GRANULARITY}")
         for k in x:
             if x[k].x > 0.5:
                 print(k)
