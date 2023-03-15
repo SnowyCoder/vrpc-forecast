@@ -88,13 +88,14 @@ def solve_colgen(data: ProblemData, subproblem: int | None, debug: bool=False):
         cap,
         max_cap
     )
-    ctx = Context(cgdata)
+    ctx = Context(cgdata, debug)
 
     routes = initial_sol(ctx)
     used = derive_clients_count(routes, n_nodes)
     print("Initial routes:")
     print(routes)
-    print(f"Initial dist: {(sum(r.cost for r in routes)) / DISTANCE_GRANULARITY}")
+    initial_dist = sum(r.cost for r in routes)
+    print(f"Initial dist: {initial_dist / DISTANCE_GRANULARITY}")
 
     m = Model('vrpc')
     m.setParam("LogToConsole", 0)
@@ -123,7 +124,7 @@ def solve_colgen(data: ProblemData, subproblem: int | None, debug: bool=False):
     print(f"Relaxed problem solved, cost: {m.objVal / DISTANCE_GRANULARITY}")
 
     # Remove relaxations and optimally solve the problem.
-    branchnprice(ctx, m)
+    branchnprice(ctx, m, initial_dist + 1)
     if ctx.best_sol is None:
         print("No feasible solution found, should be impossible")
     else:

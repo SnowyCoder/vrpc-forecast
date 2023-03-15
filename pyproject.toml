@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "meal-forecast"
+name = "forecast-vrpc"
 version = "0.1.0"
 description = ""
 authors = ["Rossi Lorenzo <snowycoder@gmail.com>"]
@@ -14,9 +14,10 @@ types-click = "^7.1.8"
 prophet = "^1.1.2"
 networkx = "^3.0"
 gurobipy = "^10.0.1"
+Cython = "^0.29.33"
 
 [tool.poetry.dev-dependencies]
 
 [build-system]
-requires = ["poetry-core>=1.0.0"]
+requires = ["poetry-core>=1.0.0", "cython"]
 build-backend = "poetry.core.masonry.api"

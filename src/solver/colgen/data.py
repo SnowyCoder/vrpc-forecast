@@ -21,13 +21,15 @@ class Route(NamedTuple):
 
 
 class Node:
+    is_debug: bool
     model: Model
     depth: int
     fixed: Dict[Tuple[int, int], bool]
     history: str
     children: List['Node']
 
-    def __init__(self, model: Model, depth: int, fixed: Dict[Tuple[int, int], bool], history: str = ''):
+    def __init__(self, is_debug: bool, model: Model, depth: int, fixed: Dict[Tuple[int, int], bool], history: str = ''):
+        self.is_debug = is_debug
         self.history = history
         self.model = model
         self.depth = depth
@@ -38,10 +40,17 @@ class Node:
         for v in self.model.getVars()[2:]:
             yield ctx.routes[v.VarName]
 
-    def child(self, model: Model, add_hist: str) -> 'Node':
-        history = ('' if self.history == '' else (self.history + ' '))
-        n = Node(model, self.depth + 1, self.fixed, history + add_hist)
-        self.children.append(n)
+    def child(self, add_hist: str, optimize_steal_model: bool = False) -> 'Node':
+        history = ('' if self.history == '' or not self.is_debug else (self.history + ' '))
+        if optimize_steal_model and not self.is_debug:
+            model = self.model
+            self.model = None
+        else:
+            model = self.model.copy()
+
+        n = Node(self.is_debug, model, self.depth + 1, self.fixed, history + add_hist)
+        if self.is_debug:
+            self.children.append(n)
         return n
 
     def fix_arc(self, ctx: 'Context', arc: Tuple[int, int], fixed_on: bool):
@@ -94,6 +103,7 @@ class Node:
 
 
 class Context:
+    is_debug: bool
     data: CGProblemData
     explored_nodes: int
     max_depth: int
@@ -114,7 +124,8 @@ class Context:
 
     routes: Dict[str, Route]
 
-    def __init__(self, data: CGProblemData):
+    def __init__(self, data: CGProblemData, is_debug: bool):
+        self.is_debug = is_debug
         self.data = data
         self.explored_nodes = 0
         self.max_depth = 0

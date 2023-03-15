@@ -6,7 +6,7 @@ from math import inf
 from .data import Route, Context
 
 
-def solve_subproblem(ctx: Context, reduced_cost: np.ndarray, max_npaths: int) -> List[Route]:
+def solve_subproblem_slow(ctx: Context, reduced_cost: np.ndarray) -> List[Route]:
     # I don't really understand the subproblem described in the paper
     # But it seems like a simple dynamic programming problem, so I'm writing my own
 
@@ -54,14 +54,12 @@ def solve_subproblem(ctx: Context, reduced_cost: np.ndarray, max_npaths: int) ->
             predecessor[i, q] = mpred
 
     # Now we can extract the paths from the last capacity level.
-    chosen = heapq.nsmallest(max_npaths,
-        [(v, i) for i in range(n_nodes) if (v := best_cost[i, max_cap - 1] + reduced_cost[i, 0]) < -0.001]
-    )
+    chosen = [i for i in range(n_nodes) if (best_cost[i, max_cap - 1] + reduced_cost[i, 0]) < -0.001]
     routes = []
 
     # print([x[0] for x in chosen])
 
-    for (reduced_cost, r) in chosen:
+    for r in chosen:
         path = [0, r]
         visited = [False] * n_nodes
         has_cycle = False
@@ -81,6 +79,18 @@ def solve_subproblem(ctx: Context, reduced_cost: np.ndarray, max_npaths: int) ->
 
     return routes
 
+try:
+    import pyximport
+    import numpy
+
+    pyximport.install(setup_args={'include_dirs': numpy.get_include()})
+
+    from .subproblem_cy import solve_subproblem
+except Exception as e:
+    print("----------- ERROR IMPORTING CYTHON SUBPROBLEM -----------")
+    print(e)
+    print("Using slow path")
+    solve_subproblem = solve_subproblem_slow
 
 # Possible implementation of the original subproblem? (doesn't work)
 # def subproblem_pulling(rcost: np.ndarray, cap: List[int], max_cap: int):

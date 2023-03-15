@@ -8,10 +8,12 @@ from .data import Context, Node
 from .optimize import optimize_problem
 
 
-def branchnprice(ctx: Context, m: Model):
-    root = Node(m, 0, {}, '')
+def branchnprice(ctx: Context, m: Model, upper_bound: int | None):
+    root = Node(ctx.is_debug, m, 0, {}, '')
     ctx.root = root
     ctx.push(root)
+    if upper_bound is not None:
+        ctx.upper_bound = upper_bound
 
     while (current := ctx.pop()) is not None:
         print(f"Solving {ctx.explored_nodes}/{len(ctx.to_explore)}: {current.model.objVal}")
@@ -47,18 +49,6 @@ def debug_explore(ctx: Context):
                     active = False
                     break
                 if choice == 'solve':
-                    # path = [0, 7, 3, 1, 9, 4, 8, 5, 2, 0]
-                    #
-                    # def addpath(p, name):
-                    #     cc = [int(i in p) for i in range(1, ctx.data.n_nodes)]
-                    #     print(cc)
-                    #     import gurobipy
-                    #     m = current.model
-                    #     z = cc + [1, 197565] + [0] * (len(m.getConstrs()) - ctx.data.n_nodes - 1)
-                    #     m.addVar(obj=197565, vtype=GRB.CONTINUOUS, name=name, column=gurobipy.Column(z, m.getConstrs()))
-                    # addpath(path, 'test1')
-                    # addpath([0, 6, 0], 'test2')
-
                     optimize_problem(ctx, current.model, current.fixed, True)
                     print("Obj: ", current.model.objVal)
                     continue
@@ -82,12 +72,16 @@ def step(ctx: Context, node: Node):
 
     for n in children:
         optimize_problem(ctx, n.model, n.fixed)
-        if n.model.status != GRB.Status.OPTIMAL:
-            n.history += ' - INFEASIBLE'
-        elif n.model.objVal >= ctx.upper_bound:
-            n.history += f' - UB-CUT ({n.model.objVal})'
-        else:
-            n.history += f' - ({n.model.objVal})'
+        feasible = n.model.status == GRB.Status.OPTIMAL
+        ub_pass = feasible and n.model.objVal < ctx.upper_bound
+        if ctx.is_debug:
+            if not feasible:
+                n.history += ' - INFEASIBLE'
+            elif not ub_pass:
+                n.history += f' - UB-CUT ({n.model.objVal})'
+            else:
+                n.history += f' - ({n.model.objVal})'
+        if feasible and ub_pass:
             ctx.push(n)
 
 
@@ -99,29 +93,33 @@ def branch(ctx: Context, node: Node) -> List[Node]:
     x = mvars[2:]
 
     xdx = xd.x  # Uhhh, it does not carry though copies I think?
-    if xdx - int(xdx) > 0.001:
+    if xdx - int(xdx) > 0.001 and abs(xdx - round(xdx)) > 0.00001:
         # Branch on n. of vehicles
-        print("cut vehicles")
+        print(f"cut vehicles {xdx}")
         ctx.branches['vehicles'] += 1
-        m1 = node.model.copy()  # type: Model
-        m2 = node.model.copy()
+        n1 = node.child(f'xd<={int(xdx)}')
+        n2 = node.child(f'xd>={int(xdx)+1}', True)
+
+        m1 = n1.model
+        m2 = n2.model
         xd = m1.getVars()[0]
         m1.addConstr(xd <= int(xdx))
 
         xd = m2.getVars()[0]
         m2.addConstr(xd >= int(xdx) + 1)
-        return [node.child(m1, f'xd<={int(xdx)}'), node.child(m2, f'xd>={int(xdx)+1}')]
+        return [n1, n2]
 
     xcx = xc.x
-    if xcx - int(xcx) > 0.001:
+    if xcx - int(xcx) > 0.001 and abs(xcx - round(xcx)) > 0.00001:
         # "Branch" on total distance traveled
         ctx.branches['dist'] += 1
         print(f"cut distance {xcx}")
 
-        m = node.model.copy()
+        n = node.child(f'xc>={ceil(xcx)}', True)
+        m = n.model
         xc = m.getVars()[1]
         m.addConstr(xc >= ceil(xcx))
-        return [node.child(m, f'xc>={ceil(xcx)}')]
+        return [n]
 
     # Branch on arcs
     found = False
@@ -165,7 +163,7 @@ def branch(ctx: Context, node: Node) -> List[Node]:
             return []
         print(f"cut cyclic {selected_arc} {_score}")
 
-        n1, n2 = node.child(node.model.copy(), f'-{selected_arc}'), node.child(node.model.copy(), f'+{selected_arc}')
+        n1, n2 = node.child(f'-{selected_arc}'), node.child(f'+{selected_arc}', True)
         n1.fix_arc(ctx, selected_arc, False)
         n2.fix_arc(ctx, selected_arc, True)
         return [n1, n2]
@@ -174,8 +172,9 @@ def branch(ctx: Context, node: Node) -> List[Node]:
     # Branch on fractional arcs
     # How? compute the total flow of each arc and select the arc with the highest flow
     # (but ignore arcs that have a total flow = 1, they are either fixed or, well, every route agrees on them).
+
     for v in x:
-        if v.x < 0.001:
+        if v.x < 0.0001:
             continue
 
         route = ctx.routes[v.VarName].path
@@ -183,15 +182,15 @@ def branch(ctx: Context, node: Node) -> List[Node]:
         for i, j in zip(route[:-1], route[1:]):
             score[(i, j)] += v.x
 
-    selected_arc, _score = max(((i, s) for i, s in score.items() if s < 0.999), key=lambda e: e[1], default=(None, None))
+    selected_arc, ascore = max(((i, s) for i, s in score.items() if s < 0.999 and i not in node.fixed), key=lambda e: e[1], default=(None, None))
 
     if selected_arc is None:
         # The solution is not fractional and not cyclical, we found it
         return []
 
-    print(f"cut fractional {selected_arc}")
+    print(f"cut fractional {selected_arc} {ascore}")
     ctx.branches['fract_arc'] += 1
-    n1, n2 = node.child(node.model.copy(), f'-{selected_arc}'), node.child(node.model.copy(), f'+{selected_arc}')
+    n1, n2 = node.child(f'-{selected_arc}'), node.child(f'+{selected_arc}', True)
     n1.fix_arc(ctx, selected_arc, False)
     n2.fix_arc(ctx, selected_arc, True)
     return [n1, n2]

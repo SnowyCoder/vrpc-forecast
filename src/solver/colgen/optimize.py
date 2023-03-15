@@ -20,11 +20,13 @@ def optimize_problem(ctx: Context, m: Model, frozen: Dict[Tuple[int, int], bool]
         if m.status != GRB.OPTIMAL:
             break
         constrs = m.getConstrs()  # type: List[Constr]
-        # Dual variables for clients
-        pi_i = [0.] + [c.pi for c in constrs[:n_nodes - 1]]
+
         # Dual variable of Xd and Xc
         pi_d = constrs[n_nodes - 1].pi
         pi_c = constrs[n_nodes].pi
+
+        # Dual variables for clients
+        pi_i = [pi_d] + [c.pi for c in constrs[:n_nodes - 1]]
 
         # Compute reduced costs
         for i in range(n_nodes):
@@ -42,12 +44,13 @@ def optimize_problem(ctx: Context, m: Model, frozen: Dict[Tuple[int, int], bool]
             else:
                 rc[i, j] = inf
         if verbose:
+            print("Costs", dists)
             print(f"Dual vars: {pi_d}, {pi_c}")
             print("Reduced constrs: \n", repr(pi_i))
             print("Reduced costs: \n", repr(rc))
 
         #print("----------- Solving Subproblem -----------")
-        new_routes = solve_subproblem(ctx, rc, 100)
+        new_routes = solve_subproblem(ctx, rc)
         rclient_count = derive_clients_count(new_routes, n_nodes)
 
         if verbose:
