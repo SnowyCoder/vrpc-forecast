@@ -1,3 +1,4 @@
+import time
 from collections import defaultdict
 
 from gurobipy import Model, Var, GRB
@@ -11,14 +12,22 @@ from .optimize import optimize_problem
 def branchnprice(ctx: Context, m: Model, upper_bound: int | None):
     root = Node(ctx.is_debug, m, 0, {}, '')
     ctx.root = root
-    ctx.push(root)
+    ctx.push([root])
     if upper_bound is not None:
         ctx.upper_bound = upper_bound
+    last_print = time.time()
+    start_time = last_print
 
+    print(f"Starting branch and price algorithm, direction: {ctx.explore_dir}")
     while (current := ctx.pop()) is not None:
-        print(f"Solving {ctx.explored_nodes}/{len(ctx.to_explore)}: {current.model.objVal}")
-        if current.model.objVal < ctx.upper_bound:
-            step(ctx, current)
+        if current.model.objVal >= ctx.upper_bound:
+            continue  # Pruning
+        now = time.time()
+        if now >= last_print + 10:
+            lb = ctx.lower_bound()
+            print(f"{ctx.explored_nodes}/{ctx.unexplored_nodes} [{int(lb)}/{int(current.model.objVal)}/{int(ctx.upper_bound)}] d={current.depth} t={int(now-start_time)}s")
+            last_print += 10
+        step(ctx, current)
 
 
 def debug_explore(ctx: Context):
@@ -70,6 +79,7 @@ def step(ctx: Context, node: Node):
         # Solution is integer, no need to branch
         ctx.on_integer_solution(node)
 
+    to_explore = []
     for n in children:
         optimize_problem(ctx, n.model, n.fixed)
         feasible = n.model.status == GRB.Status.OPTIMAL
@@ -82,7 +92,8 @@ def step(ctx: Context, node: Node):
             else:
                 n.history += f' - ({n.model.objVal})'
         if feasible and ub_pass:
-            ctx.push(n)
+            to_explore.append(n)
+    ctx.push(to_explore)
 
 
 def branch(ctx: Context, node: Node) -> List[Node]:
@@ -95,7 +106,7 @@ def branch(ctx: Context, node: Node) -> List[Node]:
     xdx = xd.x  # Uhhh, it does not carry though copies I think?
     if xdx - int(xdx) > 0.001 and abs(xdx - round(xdx)) > 0.00001:
         # Branch on n. of vehicles
-        print(f"cut vehicles {xdx}")
+        # print(f"cut vehicles {xdx}")
         ctx.branches['vehicles'] += 1
         n1 = node.child(f'xd<={int(xdx)}')
         n2 = node.child(f'xd>={int(xdx)+1}', True)
@@ -113,7 +124,7 @@ def branch(ctx: Context, node: Node) -> List[Node]:
     if xcx - int(xcx) > 0.001 and abs(xcx - round(xcx)) > 0.00001:
         # "Branch" on total distance traveled
         ctx.branches['dist'] += 1
-        print(f"cut distance {xcx}")
+        # print(f"cut distance {xcx}")
 
         n = node.child(f'xc>={ceil(xcx)}', True)
         m = n.model
@@ -161,7 +172,7 @@ def branch(ctx: Context, node: Node) -> List[Node]:
                 if v.x > 0.001 and ctx.routes[v.VarName].has_cycles:
                     print(v.x, ctx.routes[v.VarName].path)
             return []
-        print(f"cut cyclic {selected_arc} {_score}")
+        # print(f"cut cyclic {selected_arc} {_score}")
 
         n1, n2 = node.child(f'-{selected_arc}'), node.child(f'+{selected_arc}', True)
         n1.fix_arc(ctx, selected_arc, False)
@@ -188,7 +199,7 @@ def branch(ctx: Context, node: Node) -> List[Node]:
         # The solution is not fractional and not cyclical, we found it
         return []
 
-    print(f"cut fractional {selected_arc} {ascore}")
+    # print(f"cut fractional {selected_arc} {ascore}")
     ctx.branches['fract_arc'] += 1
     n1, n2 = node.child(f'-{selected_arc}'), node.child(f'+{selected_arc}', True)
     n1.fix_arc(ctx, selected_arc, False)

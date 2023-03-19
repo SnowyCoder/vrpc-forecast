@@ -1,5 +1,4 @@
 from typing import List
-import heapq
 import numpy as np
 from math import inf
 
@@ -83,13 +82,13 @@ try:
     import pyximport
     import numpy
 
-    pyximport.install(setup_args={'include_dirs': numpy.get_include()})
+    pyximport.install(setup_args={'include_dirs': numpy.get_include()}, language_level=3)
 
     from .subproblem_cy import solve_subproblem
 except Exception as e:
     print("----------- ERROR IMPORTING CYTHON SUBPROBLEM -----------")
     print(e)
-    print("Using slow path")
+    print("Using slow, python implementation")
     solve_subproblem = solve_subproblem_slow
 
 # Possible implementation of the original subproblem? (doesn't work)

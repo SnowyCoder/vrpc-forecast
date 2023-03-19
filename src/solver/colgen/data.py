@@ -1,4 +1,4 @@
-from typing import NamedTuple, List, Dict, Tuple
+from typing import NamedTuple, List, Dict, Tuple, Literal
 import numpy as np
 from gurobipy import Model
 import heapq
@@ -14,7 +14,7 @@ class CGProblemData(NamedTuple):
 
 
 class Route(NamedTuple):
-    path: List[int]
+    path: Tuple[int, ...]
     has_cycles: bool
     cost: int
     var_name: str
@@ -41,14 +41,18 @@ class Node:
             yield ctx.routes[v.VarName]
 
     def child(self, add_hist: str, optimize_steal_model: bool = False) -> 'Node':
-        history = ('' if self.history == '' or not self.is_debug else (self.history + ' '))
+        if self.is_debug:
+            history = ('' if self.history == '' else (self.history + ' ')) + add_hist
+        else:
+            history = ''
+
         if optimize_steal_model and not self.is_debug:
             model = self.model
             self.model = None
         else:
             model = self.model.copy()
 
-        n = Node(self.is_debug, model, self.depth + 1, self.fixed, history + add_hist)
+        n = Node(self.is_debug, model, self.depth + 1, self.fixed, history)
         if self.is_debug:
             self.children.append(n)
         return n
@@ -102,14 +106,16 @@ class Node:
         return True
 
 
+ExploreDir = Literal['lower', 'deeper', 'mixed']
+
 class Context:
     is_debug: bool
     data: CGProblemData
     explored_nodes: int
-    max_depth: int
+    explore_dir: ExploreDir
 
     to_explore: List[Tuple[int, Node]]
-    lower_bound: float
+    explore_stack: List[Node]  # Used with mixed exploration
     upper_bound: float
     next_route_id: int
     branches = {
@@ -123,35 +129,60 @@ class Context:
     best_sol: Node | None
 
     routes: Dict[str, Route]
+    routes_by_path: Dict[Tuple[int, ...], Route]
 
-    def __init__(self, data: CGProblemData, is_debug: bool):
+    def __init__(self, data: CGProblemData, is_debug: bool, explore_dir: ExploreDir):
         self.is_debug = is_debug
         self.data = data
         self.explored_nodes = 0
-        self.max_depth = 0
+        self.unexplored_nodes = 0
+        self.explore_dir = explore_dir
 
         self.to_explore = []
+        self.explore_stack = []
         self.upper_bound = inf
         self.next_route_id = 0
 
         self.routes = {}
+        self.routes_by_path = {}
         self.root = None
         self.best_sol = None
 
-    def push(self, n: Node):
-        heapq.heappush(self.to_explore, (n.model.objVal, n))
+    def lower_bound(self) -> float:
+        if self.explore_dir == 'lower':
+            return self.to_explore[0][0]
+        else:
+            return min(map(lambda n: n.model.objVal, self.explore_stack))
+
+    def push(self, n: List[Node]):
+        self.unexplored_nodes += len(n)
+        if self.explore_dir == 'lower':
+            for e in n:
+                heapq.heappush(self.to_explore, (e.model.objVal, e))
+        elif self.explore_dir == 'deeper':
+            self.explore_stack.extend(n[::-1])
+        elif self.explore_dir == 'mixed':
+            # Put most promising nodes first
+            self.explore_stack.extend(sorted(n, key=lambda e: -e.model.objVal))
 
     def pop(self) -> Node | None:
-        if len(self.to_explore) == 0:
+        if len(self.to_explore) + len(self.explore_stack) == 0:
             return None
-        el = heapq.heappop(self.to_explore)
         self.explored_nodes += 1
-        return el[1]
+        self.unexplored_nodes -= 1
+        if self.explore_dir == 'lower':
+            return heapq.heappop(self.to_explore)[1]
+        else:
+            return self.explore_stack.pop()
 
     def add_route(self, path: List[int], has_cycles: bool, cost: int) -> Route:
         name = f'r{len(self.routes)}'
+        path = tuple(path)
+        if r := self.routes_by_path.get(path, None):
+            return r
         r = Route(path, has_cycles, cost, name)
         self.routes[name] = r
+        self.routes_by_path[path] = r
         return r
 
     def on_integer_solution(self, node: Node):
@@ -160,3 +191,5 @@ class Context:
             print(f"### Integer solution found {val} ###")
             self.upper_bound = val
             self.best_sol = node
+        if self.explore_dir == 'lower':
+            self.to_explore.clear()

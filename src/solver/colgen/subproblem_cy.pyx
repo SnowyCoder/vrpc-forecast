@@ -1,11 +1,10 @@
 from typing import List
-import heapq
 import numpy as np
 cimport numpy as np
 
 from math import inf
 
-from .data import Route, Context
+from .data import Route
 
 #define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
 
@@ -38,6 +37,7 @@ def solve_subproblem(ctx, double[:,:] reduced_cost) -> List[Route]:
     predecessor[0, 0, 0] = 0
     predecessor[0, 0, 1] = 0
 
+    # We cannot define this inside of the cycles
     cdef double mval = inf
     cdef int mpred_i = -1
     cdef int mpred_q = -1

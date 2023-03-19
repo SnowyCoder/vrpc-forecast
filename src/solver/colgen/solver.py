@@ -1,6 +1,6 @@
 from .optimize import derive_clients_count, optimize_problem
 from ..common import ProblemData, points_to_distance_matrix, MAX_CAPACITY_PER_VEHICLE, GRANULARITY, DISTANCE_GRANULARITY
-from .data import Context, CGProblemData, Route
+from .data import Context, CGProblemData, Route, ExploreDir
 from .branchnprice import branchnprice, debug_explore
 
 from gurobipy import Model, quicksum as qsum, GRB
@@ -64,7 +64,7 @@ def initial_sol(ctx: Context) -> List[Route]:
     return routes
 
 
-def solve_colgen(data: ProblemData, subproblem: int | None, debug: bool=False):
+def solve_colgen(data: ProblemData, subproblem: int | None, debug: bool=False, explore_dir: ExploreDir = 'mixed'):
     facilities = data.facilities
 
     # Limit problem (if asked)
@@ -88,7 +88,7 @@ def solve_colgen(data: ProblemData, subproblem: int | None, debug: bool=False):
         cap,
         max_cap
     )
-    ctx = Context(cgdata, debug)
+    ctx = Context(cgdata, debug, explore_dir)
 
     routes = initial_sol(ctx)
     used = derive_clients_count(routes, n_nodes)
@@ -117,6 +117,7 @@ def solve_colgen(data: ProblemData, subproblem: int | None, debug: bool=False):
     m.addConstr(qsum(x[r]*routes[r].cost for r in range(len(routes))) == xc)
 
     m.write('model.lp')
+    print("Optimizing initial problem")
 
     # Optimize + subproblem until an optimal solution is found
     optimize_problem(ctx, m, {})
@@ -124,7 +125,11 @@ def solve_colgen(data: ProblemData, subproblem: int | None, debug: bool=False):
     print(f"Relaxed problem solved, cost: {m.objVal / DISTANCE_GRANULARITY}")
 
     # Remove relaxations and optimally solve the problem.
-    branchnprice(ctx, m, initial_dist + 1)
+    try:
+        branchnprice(ctx, m, initial_dist + 1)
+    except KeyboardInterrupt:
+        print("Interrupted")
+
     if ctx.best_sol is None:
         print("No feasible solution found, should be impossible")
     else:
