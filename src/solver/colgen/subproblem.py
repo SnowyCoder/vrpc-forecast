@@ -25,7 +25,9 @@ def solve_subproblem_slow(ctx: Context, reduced_cost: np.ndarray) -> List[Route]
         max_cap = csum
 
     best_cost = np.full((n_nodes, max_cap + 1), inf)
+    best_cost_alt = np.full((n_nodes, max_cap + 1), inf)
     predecessor = np.full((n_nodes, max_cap + 1, 2), -1)
+    predecessor_alt = np.full((n_nodes, max_cap + 1, 2), -1)
 
     # Root
     best_cost[0, 0] = 0
@@ -35,22 +37,37 @@ def solve_subproblem_slow(ctx: Context, reduced_cost: np.ndarray) -> List[Route]
         # if q % 100 == 0:
         #     print(f'{q}..', end='', flush=True)
         for i in range(1, n_nodes):
-            mval = inf
-            mpred = (-1, -1)
+            # For each node save the best two states
+            mval1 = inf
+            mpred1 = (-1, -1)
+            mval2 = inf
+            mpred2 = (-1, -1)
             qi = data.cap[i]
             for j in range(n_nodes):
                 if i == j:
                     continue
                 for qp in range(q - qi + 1):
-                    if predecessor[j, qp][0] == i or predecessor[tuple(predecessor[j, qp])][0] == i:
-                        continue
-                    pc = best_cost[j, qp] + reduced_cost[j, i]
-                    if pc < mval:
-                        mval = pc
-                        mpred = (j, qp)
+                    if predecessor[j, qp, 0] == i:
+                        if predecessor_alt[j, qp, 0] == -1:
+                            pass
+                        bc = best_cost_alt[j, qp]
+                    else:
+                        bc = best_cost[j, qp]
 
-            best_cost[i, q] = mval
-            predecessor[i, q] = mpred
+                    # if predecessor[j, qp][0] == i or predecessor[tuple(predecessor[j, qp])][0] == i:
+                    #     pass  # continue
+                    pc = bc + reduced_cost[j, i]
+                    if pc < mval2:
+                        mval2 = pc
+                        mpred2 = (j, qp)
+                    if mval2 < mval1:
+                        mval1, mval2 = mval2, mval1
+                        mpred1, mpred2 = mpred2, mpred1
+
+            best_cost[i, q] = mval1
+            predecessor[i, q] = mpred1
+            best_cost_alt[i, q] = mval2
+            predecessor_alt[i, q] = mpred2
 
     # Now we can extract the paths from the last capacity level.
     chosen = [i for i in range(n_nodes) if (best_cost[i, max_cap - 1] + reduced_cost[i, 0]) < -0.001]
@@ -59,6 +76,7 @@ def solve_subproblem_slow(ctx: Context, reduced_cost: np.ndarray) -> List[Route]
     # print([x[0] for x in chosen])
 
     for r in chosen:
+        rpar = -1
         path = [0, r]
         visited = [False] * n_nodes
         has_cycle = False
@@ -67,7 +85,13 @@ def solve_subproblem_slow(ctx: Context, reduced_cost: np.ndarray) -> List[Route]
         original_cost = original_dist[0, r]
         c = max_cap
         while r != 0:
-            r, c = predecessor[r, c]
+            if predecessor[r, c][0] != rpar:
+                rpar = r
+                r, c = predecessor[r, c]
+            else:
+                rpar = r
+                r, c = predecessor_alt[r, c]
+
             has_cycle |= visited[r]
             visited[r] = True
             original_cost += original_dist[path[-1], r]
@@ -78,10 +102,10 @@ def solve_subproblem_slow(ctx: Context, reduced_cost: np.ndarray) -> List[Route]
 
     return routes
 
+
 try:
     import pyximport
     import numpy
-
     pyximport.install(setup_args={'include_dirs': numpy.get_include()}, language_level=3)
 
     from .subproblem_cy import solve_subproblem

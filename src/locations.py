@@ -1,5 +1,6 @@
 from hashlib import sha256
-from typing import Dict, NamedTuple
+from math import sqrt
+from typing import Dict, NamedTuple, List
 import pandas as pd
 from numpy import random, linalg
 import numpy as np
@@ -87,7 +88,7 @@ def generate_center_locations(seed: str=None) -> Locations:
     # Where should the distribution center be?
     # I imagine that it's more likely to be in a larger city
     # To simulate this behaviour, select randomly a center and generate another location in the same city
-    # This should give a better chance to biffer cities
+    # This should give a better chance to bigger cities
     i = rng.integers(0, len(df), 1)[0]
     city_pos = cities[df.iloc[i]['city_code']]
     while True:
@@ -105,20 +106,70 @@ def plot_locations(locs: Locations):
     from matplotlib import pyplot
 
     print("[plot_locs] Plotting")
+
     # Regions: blue & annotated
-    pyplot.scatter(*zip(*locs.regions.values()), s=400, alpha=0.5)
+    regions = pyplot.scatter(*zip(*locs.regions.values()), s=400, c='#FFFD00')
     for k in locs.regions:
         pyplot.annotate(str(k), locs.regions[k], ha='center', va='center')
 
     # Cities: red
-    pyplot.scatter(*zip(*locs.cities.values()), c='r', s=100)
+    cities = pyplot.scatter(*zip(*locs.cities.values()), c='#FFAA00', s=100)
 
     df = locs.df
+    centers = None
     # Centers: green (with variable size)
     for _idx, row in df.iterrows():
         p = locs.centers[row['center_id']]
-        pyplot.scatter(*p, row['op_area']*10, c='g')
+        centers = pyplot.scatter(*p, row['op_area']*10, c='#FF0700')
 
-    pyplot.scatter(*locs.distribution_center, 200, c='y', alpha=0.7)
+    depot = pyplot.scatter(*locs.distribution_center, 200, c='#1240AB', alpha=0.7)
 
+    pyplot.legend(
+        (regions, cities, centers, depot),
+        ('Region', 'City', 'Center', 'Depot'),
+        scatterpoints=1
+    )
+
+    pyplot.show()
+
+
+def plot_solution(locs: Locations, routes: List[List[int]]):
+    from matplotlib import pyplot
+
+    depot = pyplot.scatter(*locs.distribution_center, 200, c='#1240AB', alpha=0.7)
+
+    df = locs.df
+    centers = None
+    # Centers: green (with variable size)
+    for _idx, row in df.iterrows():
+        p = locs.centers[row['center_id']]
+        centers = pyplot.scatter(*p, row['op_area'] * 10, c='#FF0700')
+
+    tot_dist = 0
+    for route in routes:
+        route = route
+        x, y = [], []
+        x.append(locs.distribution_center[0])
+        y.append(locs.distribution_center[1])
+        for i in route:
+            x.append(locs.centers[i][0])
+            y.append(locs.centers[i][1])
+
+        x.append(locs.distribution_center[0])
+        y.append(locs.distribution_center[1])
+
+        dist = 0
+        for (px, nx), (py, ny) in zip(zip(x[:-1], x[1:]), zip(y[:-1], y[1:])):
+            dist += sqrt((px - nx)**2 + (py - ny)**2)
+        tot_dist += dist
+        pyplot.plot(x, y)
+
+    pyplot.legend(
+        (centers, depot),
+        ('Center', 'Depot'),
+        scatterpoints=1
+    )
+
+    text = f'Cost: {tot_dist:.2f}'
+    pyplot.figtext(0.5, 0.01, text, horizontalalignment='center', fontsize=15)
     pyplot.show()

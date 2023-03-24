@@ -41,10 +41,27 @@ def generate_data(seed=None):
 
 
 @cli.command()
+@click.argument('routes', )
+@click.option('--seed', help='Seed used for location generation')
+def plot_routes(routes: str, seed=None):
+    """
+    Plots a given solution into the location graph.
+
+    ROUTES: the encoded solution, each route should be separated by '_' and each node in the route by '-'
+            e.g. 1-2-5_3-4-6
+    """
+
+    routes = routes.split('_')
+    routes = [list(map(int, r.split('-'))) for r in routes]
+    locs = lib.locations.generate_center_locations(seed=seed)
+    lib.locations.plot_solution(locs, routes)
+
+
+@cli.command()
 @click.option('--loc-seed', help='Seed to use for location data generation')
 @click.option('--no-cache', is_flag=True, show_default=True, default=False,
               help='If set, the program will regenerate the ingredients data, ignoring cache status.')
-@click.option('--forecast-method', type=click.Choice(['prophet', 'average']), default='average',
+@click.option('--forecast-method', type=click.Choice(['prophet', 'average', 'real']), default='average',
               help='Selects the forecast method to use')
 @click.option('--subproblem', type=int, help='If set will limit the number of locations to account for.')
 @click.option('--method', type=click.Choice(['poly', 'subtour_elim', 'colgen'], case_sensitive=False), default='colgen',
@@ -69,8 +86,10 @@ def solve(loc_seed=None, no_cache=False, forecast_method: str = 'average', subpr
 
     if forecast_method == 'average':
         forecast_results = lib.forecast.forecast_average(forecast_data, use_cache=use_cache)
-    else:
+    elif forecast_method == 'prophet':
         forecast_results = lib.forecast.forecast_prophet(forecast_data, use_cache=use_cache)
+    else:
+        forecast_results = lib.forecast.forecast_noop(forecast_data)
 
     locs = lib.locations.generate_center_locations(seed=loc_seed)
 
@@ -83,14 +102,25 @@ def solve(loc_seed=None, no_cache=False, forecast_method: str = 'average', subpr
         FacilityData(str(k), locs.centers[k], materials[k]) for k in locs.centers
     ]
 
-    data = ProblemData(facilities, locs.distribution_center, 100)
+    data = ProblemData(facilities, locs.distribution_center)
 
     if method == 'poly':
-        lib.solver.solve_flow_poly(data, subproblem)
+        sol = lib.solver.solve_flow_poly(data, subproblem)
     elif method == 'subtour_elim':
-        lib.solver.solve_subtour_elim(data, subproblem)
+        sol = lib.solver.solve_subtour_elim(data, subproblem)
     elif method == 'colgen':
-        lib.solver.solve_colgen(data, subproblem, debug, explore_dir)
+        sol = lib.solver.solve_colgen(data, subproblem, debug, explore_dir)
+    else:
+        sol = None
+
+    if sol is None:
+        print("No feasible solution found")
+    else:
+        print(f"Found feasible solution, cost: {sol.total_cost}")
+        print(f"Used paths: {len(sol.routes)}")
+        for r in sol.routes:
+            print(' '.join(data.facilities[x].name for x in r))
+        print("Encoded solution: ", sol.encode(data))
 
 
 if __name__ == '__main__':

@@ -1,0 +1,143 @@
+Loading data...
+Data loaded
+Train:	144
+Test:	1
+[average] Using cache
+[center_locs] Generating regions
+[center_locs] Generating cities
+[center_locs] Generating centers
+[center_locs] Generated!
+Initial routes:
+[Route(path=(0, 6, 41, 38, 7, 39, 23, 26, 14, 25, 48, 10, 40, 0), has_cycles=False, cost=64364.0, var_name='r0'), Route(path=(0, 54, 58, 42, 72, 19, 30, 77, 56, 0), has_cycles=False, cost=151446.0, var_name='r1'), Route(path=(0, 45, 2, 73, 3, 0), has_cycles=False, cost=61340.0, var_name='r2'), Route(path=(0, 20, 28, 37, 31, 63, 0), has_cycles=False, cost=77532.0, var_name='r3'), Route(path=(0, 64, 74, 57, 66, 18, 55, 0), has_cycles=False, cost=91554.0, var_name='r4'), Route(path=(0, 27, 1, 51, 52, 32, 68, 0), has_cycles=False, cost=98667.0, var_name='r5'), Route(path=(0, 67, 65, 75, 12, 11, 17, 0), has_cycles=False, cost=125327.0, var_name='r6'), Route(path=(0, 46, 47, 70, 44, 43, 59, 0), has_cycles=False, cost=116604.0, var_name='r7'), Route(path=(0, 61, 22, 29, 9, 53, 13, 50, 36, 24, 16, 34, 0), has_cycles=False, cost=205692.0, var_name='r8'), Route(path=(0, 69, 62, 33, 60, 21, 49, 76, 8, 15, 35, 5, 71, 0), has_cycles=False, cost=197582.0, var_name='r9'), Route(path=(0, 4, 0), has_cycles=False, cost=166092.0, var_name='r10')]
+Initial dist: 13562.0
+Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 937385
+Academic license - for non-commercial use only - registered to 273693@studenti.unimore.it
+Optimizing initial problem
+Relaxed problem solved, cost: 10836.772628853063
+Starting branch and price algorithm, direction: mixed
+27/9 [1088868/1095821/1356201] d=24 t=10s
+57/25 [1088868/1098836/1356201] d=54 t=20s
+85/36 [1088868/1103210/1356201] d=82 t=30s
+114/47 [1088868/1109921/1356201] d=111 t=40s
+148/60 [1088868/1140733/1356201] d=145 t=50s
+166/66 [1088868/1145588/1356201] d=163 t=61s
+184/75 [1088868/1146943/1356201] d=181 t=73s
+190/79 [1088868/1150877/1356201] d=187 t=81s
+206/84 [1088868/1175526/1356201] d=203 t=90s
+235/90 [1088868/1227649/1356201] d=232 t=100s
+262/95 [1088868/1257121/1356201] d=252 t=110s
+306/101 [1088868/1315612/1356201] d=286 t=120s
+372/100 [1088868/1349542/1356201] d=306 t=130s
+427/99 [1088868/1332065/1356201] d=302 t=140s
+474/100 [1088868/1306805/1356201] d=280 t=150s
+508/106 [1088868/1345547/1356201] d=302 t=160s
+555/102 [1088868/1335964/1356201] d=287 t=170s
+594/101 [1088868/1342470/1356201] d=287 t=180s
+638/104 [1088868/1353234/1356201] d=299 t=190s
+681/103 [1088868/1350314/1356201] d=301 t=200s
+724/100 [1088868/1323197/1356201] d=283 t=210s
+773/106 [1088868/1352352/1356201] d=309 t=220s
+811/105 [1088868/1331583/1356201] d=296 t=230s
+860/107 [1088868/1350317/1356201] d=318 t=240s
+895/105 [1088868/1355792/1356201] d=311 t=250s
+927/103 [1088868/1334312/1356201] d=293 t=260s
+971/106 [1088868/1347834/1356201] d=307 t=270s
+1012/102 [1088868/1343995/1356201] d=297 t=280s
+1050/103 [1088868/1345378/1356201] d=299 t=290s
+1097/102 [1088868/1347473/1356201] d=301 t=300s
+1140/100 [1088868/1354505/1356201] d=303 t=310s
+1195/98 [1088868/1307032/1356201] d=277 t=320s
+1241/99 [1088868/1353062/1356201] d=284 t=330s
+1291/100 [1088868/1319241/1356201] d=285 t=340s
+1339/98 [1088868/1343003/1356201] d=283 t=350s
+1403/98 [1088868/1348796/1356201] d=292 t=360s
+1461/100 [1088868/1342349/1356201] d=306 t=370s
+1515/97 [1088868/1354512/1356201] d=302 t=380s
+1555/96 [1088868/1344053/1356201] d=306 t=390s
+1587/97 [1088868/1307170/1356201] d=268 t=400s
+1622/100 [1088868/1333304/1356201] d=303 t=410s
+1648/101 [1088868/1351639/1356201] d=313 t=421s
+1680/100 [1088868/1322336/1356201] d=291 t=430s
+1708/99 [1088868/1346000/1356201] d=303 t=440s
+1745/99 [1088868/1312343/1356201] d=275 t=450s
+1772/101 [1088868/1315468/1356201] d=288 t=460s
+1796/104 [1088868/1344261/1356201] d=303 t=470s
+1822/101 [1088868/1325918/1356201] d=293 t=480s
+1850/103 [1088868/1344245/1356201] d=312 t=490s
+1868/105 [1088868/1355045/1356201] d=324 t=500s
+1888/104 [1088868/1347723/1356201] d=319 t=510s
+1906/101 [1088868/1338780/1356201] d=298 t=520s
+1946/99 [1088868/1322533/1356201] d=285 t=530s
+1967/102 [1088868/1345802/1356201] d=305 t=540s
+1989/103 [1088868/1343284/1356201] d=306 t=550s
+2010/102 [1088868/1352330/1356201] d=304 t=560s
+2038/100 [1088868/1333658/1356201] d=302 t=570s
+2056/102 [1088868/1355508/1356201] d=320 t=580s
+2076/99 [1088868/1330017/1356201] d=286 t=590s
+2109/100 [1088868/1344830/1356201] d=296 t=600s
+2136/101 [1088868/1342192/1356201] d=303 t=610s
+2163/99 [1088868/1339778/1356201] d=279 t=620s
+2182/101 [1088868/1351017/1356201] d=287 t=630s
+2203/99 [1088868/1349226/1356201] d=283 t=640s
+2230/98 [1088868/1344509/1356201] d=292 t=650s
+2254/100 [1088868/1331243/1356201] d=288 t=660s
+2280/102 [1088868/1354482/1356201] d=314 t=670s
+2311/101 [1088868/1351244/1356201] d=320 t=680s
+2344/99 [1088868/1332082/1356201] d=288 t=690s
+2372/101 [1088868/1351771/1356201] d=316 t=700s
+2423/98 [1088868/1350921/1356201] d=295 t=710s
+2478/99 [1088868/1345803/1356201] d=303 t=720s
+2519/98 [1088868/1330718/1356201] d=280 t=730s
+2561/97 [1088868/1334109/1356201] d=282 t=740s
+2611/97 [1088868/1345870/1356201] d=288 t=750s
+2665/94 [1088868/1271870/1356201] d=254 t=760s
+2710/97 [1088868/1276548/1356201] d=276 t=770s
+2755/101 [1088868/1323192/1356201] d=313 t=780s
+### Integer solution found 1348259.0000000005 ###
+### Integer solution found 1326325.0 ###
+2789/100 [1088868/1315771/1326325] d=303 t=790s
+2819/98 [1088868/1311109/1326325] d=296 t=800s
+### Integer solution found 1315802.0 ###
+2857/92 [1088868/1252616/1315802] d=247 t=810s
+2897/95 [1088868/1270028/1315802] d=268 t=820s
+2942/96 [1088868/1298719/1315802] d=277 t=830s
+2991/100 [1088868/1314208/1315802] d=275 t=840s
+3044/99 [1088868/1306722/1315802] d=279 t=850s
+3085/100 [1088868/1305901/1315802] d=272 t=860s
+3124/97 [1088868/1297121/1315802] d=269 t=870s
+3174/96 [1088868/1307040/1315802] d=273 t=880s
+3214/93 [1088868/1305334/1315802] d=266 t=890s
+3241/98 [1088868/1291539/1315802] d=270 t=900s
+3287/96 [1088868/1296283/1315802] d=271 t=910s
+3323/96 [1088868/1303485/1315802] d=282 t=920s
+3383/97 [1088868/1304141/1315802] d=279 t=930s
+3420/96 [1088868/1315319/1315802] d=277 t=940s
+3474/92 [1088868/1287502/1315802] d=256 t=950s
+Traceback (most recent call last):
+  File "/run/media/snowy/Volume/misc/uni/2021/2022/aottimizzaz/exam/project/src/main.py", line 97, in <module>
+    cli()
+  File "/run/media/snowy/Volume/misc/uni/2021/2022/aottimizzaz/exam/project/.venv/lib/python3.10/site-packages/click/core.py", line 1130, in __call__
+    return self.main(*args, **kwargs)
+  File "/run/media/snowy/Volume/misc/uni/2021/2022/aottimizzaz/exam/project/.venv/lib/python3.10/site-packages/click/core.py", line 1055, in main
+    rv = self.invoke(ctx)
+  File "/run/media/snowy/Volume/misc/uni/2021/2022/aottimizzaz/exam/project/.venv/lib/python3.10/site-packages/click/core.py", line 1657, in invoke
+    return _process_result(sub_ctx.command.invoke(sub_ctx))
+  File "/run/media/snowy/Volume/misc/uni/2021/2022/aottimizzaz/exam/project/.venv/lib/python3.10/site-packages/click/core.py", line 1404, in invoke
+    return ctx.invoke(self.callback, **ctx.params)
+  File "/run/media/snowy/Volume/misc/uni/2021/2022/aottimizzaz/exam/project/.venv/lib/python3.10/site-packages/click/core.py", line 760, in invoke
+    return __callback(*args, **kwargs)
+  File "/run/media/snowy/Volume/misc/uni/2021/2022/aottimizzaz/exam/project/src/main.py", line 93, in solve
+    lib.solver.solve_colgen(data, subproblem, debug, explore_dir)
+  File "/run/media/snowy/Volume/misc/uni/2021/2022/aottimizzaz/exam/project/src/solver/colgen/solver.py", line 129, in solve_colgen
+    branchnprice(ctx, m, initial_dist + 1)
+  File "/run/media/snowy/Volume/misc/uni/2021/2022/aottimizzaz/exam/project/src/solver/colgen/branchnprice.py", line 30, in branchnprice
+    step(ctx, current)
+  File "/run/media/snowy/Volume/misc/uni/2021/2022/aottimizzaz/exam/project/src/solver/colgen/branchnprice.py", line 84, in step
+    optimize_problem(ctx, n.model, n.fixed)
+  File "/run/media/snowy/Volume/misc/uni/2021/2022/aottimizzaz/exam/project/src/solver/colgen/optimize.py", line 18, in optimize_problem
+    m.optimize()
+  File "src/gurobipy/model.pxi", line 875, in gurobipy.Model.optimize
+gurobipy.GurobiError: Too many sessions, 5 active sessions for a baseline of 2
+Warning: environment still referenced so free is deferred (Continue to use WLS)

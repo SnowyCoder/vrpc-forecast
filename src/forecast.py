@@ -118,7 +118,7 @@ def forecast_average(data: DataCollection, use_cache: bool = True) -> pd.DataFra
         print('[average] Using cache')
         return cache
 
-    WEEK_AVERAGED_COUNT = 1
+    WEEK_AVERAGED_COUNT = 3
     print(f'[average] Projecting last {WEEK_AVERAGED_COUNT} weeks average on next {TESTING_WEEKS} weeks')
     df = data.train
     last_week = df.index[-1]
@@ -137,17 +137,32 @@ def forecast_average(data: DataCollection, use_cache: bool = True) -> pd.DataFra
     return res
 
 
+def forecast_noop(data: DataCollection) -> pd.DataFrame:
+    df = data.train
+    last_week = df.index[-1]
+    d = {
+        'ds': [last_week + x for x in range(TESTING_WEEKS)]
+    }
+    for c in df.columns:
+        x = df[c].iloc[-1]
+
+        d[f"{c[0]}-{c[1]}"] = [x]
+
+    res = pd.DataFrame(data=d)
+    return res
+
+
 def compare_forecasts(data: DataCollection, res: Dict[str, pd.DataFrame]):
     ground_truth = collapse_center_meal(data.test.reset_index(drop=True))
 
     col = ground_truth.columns
     rng = random.Random('compare_forecasts.001')
     sample = rng.choices(range(len(ground_truth.columns)), k=9)
-    print(sample)
     sample = [col[i] for i in sample]
-    print(sample)
     fig, axs = plt.subplots(3, 3)
-    # breakpoint()
+
+    mse_by_forecast = {}
+
     for i, c in enumerate(sample):
         axs[i % 3, i // 3].plot(ground_truth[c].index, ground_truth[c].values, 'o', label="ground_truth")
 
@@ -159,9 +174,15 @@ def compare_forecasts(data: DataCollection, res: Dict[str, pd.DataFrame]):
         for i, c in enumerate(sample):
             axs[i % 3, i // 3].plot(df[c].index, df[c].values, 'o', label=key)
         mse = mean_squared_error(ground_truth, df)
+        mse_by_forecast[key] = mse
         print(f'[compare]: {key}:\t{mse}')
 
-    plt.legend()
+
+    handles, labels = plt.gca().get_legend_handles_labels()
+    by_label = dict(zip(labels, handles))
+    plt.figlegend(by_label.values(), by_label.keys(), loc='upper center', ncol=4, bbox_to_anchor = (0, -0.05, 1, 1))
+    text = 'MSE [' + (', '.join(f'{k}: {v:0.2f}' for k, v in mse_by_forecast.items()) + ']')
+    plt.figtext(0.5, 0.01, text, horizontalalignment='center', fontsize=15)
     plt.show()
 
 

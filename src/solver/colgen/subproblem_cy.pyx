@@ -6,7 +6,6 @@ from math import inf
 
 from .data import Route
 
-#define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
 
 def solve_subproblem(ctx, double[:,:] reduced_cost) -> List[Route]:
     # I don't really understand the subproblem described in the paper
@@ -30,7 +29,9 @@ def solve_subproblem(ctx, double[:,:] reduced_cost) -> List[Route]:
         max_cap = csum
 
     cdef double[:,:] best_cost = np.full((n_nodes, max_cap + 1), inf)
+    cdef double[:,:] best_cost_alt = np.full((n_nodes, max_cap + 1), inf)
     cdef int[:,:,:] predecessor = np.full((n_nodes, max_cap + 1, 2), -1, dtype=np.int32)
+    cdef int[:,:,:] predecessor_alt = np.full((n_nodes, max_cap + 1, 2), -1, dtype=np.int32)
 
     # Root
     best_cost[0, 0] = 0
@@ -38,14 +39,13 @@ def solve_subproblem(ctx, double[:,:] reduced_cost) -> List[Route]:
     predecessor[0, 0, 1] = 0
 
     # We cannot define this inside of the cycles
-    cdef double mval = inf
-    cdef int mpred_i = -1
-    cdef int mpred_q = -1
+    cdef double mval1, mval2
+    cdef int mpred1_i, mpred1_q, mpred2_i, mpred2_q
     cdef int qi = 0
     cdef int pj = 0
     cdef int pq = 0
     cdef int i = 0
-    cdef int j
+    cdef int j = 0
     cdef int qp
     cdef double pc = 0
 
@@ -53,28 +53,40 @@ def solve_subproblem(ctx, double[:,:] reduced_cost) -> List[Route]:
         # if q % 100 == 0:
         #     print(f'{q}..', end='', flush=True)
         for i in range(1, n_nodes):
-            mval = inf
-            mpred_i = -1
-            mpred_q = -1
+            mval1, mval2 = inf, inf
+            mpred1_i, mpred1_q = -1, -1
+            mpred2_i, mpred2_q = -1, -1
             qi = data.cap[i]
             for j in range(n_nodes):
                 if i == j:
                     continue
                 for qp in range(q - qi + 1):
                     pj = predecessor[j, qp, 0]
-                    pq = predecessor[j, qp, 1]
-                    # Remove 2 and 3 cycles
-                    if pj == i or predecessor[pj, pq, 0] == i:
-                        continue
-                    pc = best_cost[j, qp] + reduced_cost[j, i]
-                    if pc < mval:
-                        mval = pc
-                        mpred_i = j
-                        mpred_q = qp
+                    if pj == i:
+                        pj = predecessor_alt[j, qp, 0]
+                        if pj == -1:
+                            continue
+                        pq = predecessor_alt[j, qp, 1]
+                        pc = best_cost_alt[j, qp]
+                    else:
+                        pq = predecessor[j, qp, 1]
+                        pc = best_cost[j, qp]
+                    pc += reduced_cost[j, i]
+                    if pc < mval2:
+                        mval2 = pc
+                        mpred2_i, mpred2_q = j, qp
 
-            best_cost[i, q] = mval
-            predecessor[i, q, 0] = mpred_i
-            predecessor[i, q, 1] = mpred_q
+                    if mval2 < mval1:
+                        mval1, mval2 = mval2, mval1
+                        mpred2_i, mpred1_i = mpred1_i, mpred2_i
+                        mpred2_q, mpred1_q = mpred1_q, mpred2_q
+
+            best_cost[i, q] = mval1
+            predecessor[i, q, 0] = mpred1_i
+            predecessor[i, q, 1] = mpred1_q
+            best_cost_alt[i, q] = mval2
+            predecessor_alt[i, q, 0] = mpred2_i
+            predecessor_alt[i, q, 1] = mpred2_q
 
     # Now we can extract the paths from the last capacity level.
     chosen = [i for i in range(n_nodes) if (best_cost[i, max_cap - 1] + reduced_cost[i, 0]) < -0.001]

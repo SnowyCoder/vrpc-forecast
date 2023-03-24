@@ -1,0 +1,16 @@
+# Latex/Rubber outputs
+main.log
+main.aux
+main.pdf
+main.out
+main.toc
+main.bbl
+main.blg
+main.rubbercache
+main.fdb_latexmk
+main.fls
+main.synctex.gz
+
+# Vscode directory
+.vscode
+*.swp

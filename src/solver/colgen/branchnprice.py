@@ -59,7 +59,10 @@ def debug_explore(ctx: Context):
                     break
                 if choice == 'solve':
                     optimize_problem(ctx, current.model, current.fixed, True)
-                    print("Obj: ", current.model.objVal)
+                    if current.model.status == GRB.OPTIMAL:
+                        print("Obj: ", current.model.objVal)
+                    else:
+                        print("Infeasible")
                     continue
                 choice = int(choice)
                 if choice == -1:
@@ -75,6 +78,9 @@ def debug_explore(ctx: Context):
 def step(ctx: Context, node: Node):
     children = branch(ctx, node)
 
+    if children is None:
+        # Error occurred
+        return
     if len(children) == 0:
         # Solution is integer, no need to branch
         ctx.on_integer_solution(node)
@@ -96,7 +102,7 @@ def step(ctx: Context, node: Node):
     ctx.push(to_explore)
 
 
-def branch(ctx: Context, node: Node) -> List[Node]:
+def branch(ctx: Context, node: Node) -> List[Node] | None:
     mvars = node.model.getVars()  # type: List[Var]
 
     xd = mvars[0]
@@ -171,7 +177,7 @@ def branch(ctx: Context, node: Node) -> List[Node]:
             for v in x:
                 if v.x > 0.001 and ctx.routes[v.VarName].has_cycles:
                     print(v.x, ctx.routes[v.VarName].path)
-            return []
+            return None
         # print(f"cut cyclic {selected_arc} {_score}")
 
         n1, n2 = node.child(f'-{selected_arc}'), node.child(f'+{selected_arc}', True)

@@ -95,7 +95,7 @@ python-versions = "*"
 
 [[package]]
 name = "fonttools"
-version = "4.39.0"
+version = "4.39.2"
 description = "Tools to manipulate font files"
 category = "main"
 optional = false
@@ -136,7 +136,7 @@ python-versions = ">=3.6"
 
 [[package]]
 name = "holidays"
-version = "0.21"
+version = "0.21.13"
 description = "Generate and work with holidays in Python"
 category = "main"
 optional = false

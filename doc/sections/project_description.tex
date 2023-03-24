@@ -1,0 +1,18 @@
+\chapter{Project description}
+\label{project-description}
+
+The aim of this project is to address a delivery problem for a meal delivery company that operates across multiple cities and regions. The company has several distribution centers, and its first challenge is to forecast the meals that each center will need to produce for the upcoming week, based on historical data of meal purchases aggregated by week.
+Once the meals are forecasted, the company's next crucial task is to distribute the necessary ingredients from a central depot to the distribution centers. The primary objective of this task is to minimize the distance traveled during transportation.
+Overall, the project aims to streamline the meal delivery company's operations by forecasting meal requirements accurately and optimizing ingredient distribution, ultimately enhancing customer satisfaction and improving business efficiency.
+
+
+The company demand data was provided by Edwin U Kannanaikkal~\cite{analyticsvidhya2020} on Kaggle with a DbCLv1.0 license.
+To solve the forecasting task the project implements two metrics, one is a simple average of N previous weeks projected in the future, the other is a more complex integration of the popular library for forecasting, prophet~\cite{taylor2018forecasting}.
+Additional data not provided in the original files, like meal ingredients and facility locations, have been generated using a mix of statistics and machine learning to be as plausible as possible.
+Finally, different solvers for the VRPC problem have been tried, a polynomial one, one with subtour-elimination, and the last one implemented by column generation and a custom branch and price algorithm.
+
+The rest of this report is divided as follows:
+Chapter~\ref{meal-forecasting} explains our tactics for forecasting meal demands,
+Chapter~\ref{data-generation} describes how we generated the data that was not included in our data source,
+Chapter~\ref{vehicle-routing} presents our implementation of the VRPC solver,
+Chapter~\ref{results} confronts the achieved results of the project.

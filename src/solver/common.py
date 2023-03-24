@@ -23,7 +23,14 @@ class FacilityData(NamedTuple):
 class ProblemData(NamedTuple):
     facilities: List[FacilityData]
     distribution_center: np.array
-    max_vehicle_capacity: float
+
+
+class ProblemSolution(NamedTuple):
+    routes: List[List[int]]
+    total_cost: float
+
+    def encode(self, data: ProblemData) -> str:
+        return '_'.join('-'.join(map(lambda i: data.facilities[i].name, r)) for r in self.routes)
 
 
 def points_to_distance_matrix(points: List[Tuple[float, float]]) -> np.ndarray:

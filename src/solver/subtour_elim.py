@@ -1,4 +1,5 @@
-from .common import ProblemData, points_to_distance_matrix, MAX_CAPACITY_PER_VEHICLE, MAX_VEHICLES, GRANULARITY, DISTANCE_GRANULARITY
+from .common import ProblemData, points_to_distance_matrix, MAX_CAPACITY_PER_VEHICLE, MAX_VEHICLES, GRANULARITY, \
+    DISTANCE_GRANULARITY, ProblemSolution
 from gurobipy import Model, quicksum as qsum, GRB, Var
 from typing import Dict, Tuple, List
 from math import floor, ceil
@@ -54,7 +55,7 @@ def callback_create(x: Dict[Tuple[int, int, int], Var], glen: int, vlen: int):
     return subtour_elim
 
 
-def solve_subtour_elim(data: ProblemData, subproblem: int | None):
+def solve_subtour_elim(data: ProblemData, subproblem: int | None) -> ProblemSolution | None:
     facilities = data.facilities
     if subproblem is not None:
         facilities = facilities[:subproblem]
@@ -93,7 +94,6 @@ def solve_subtour_elim(data: ProblemData, subproblem: int | None):
 
     # ~~~ Flow bounds ~~~
     # Every node should have exactly one entry path and one exit path
-    n = len(C)
     m.addConstrs(qsum(x[0, j, k] for j in V) == 1 for k in K)
     m.addConstrs(qsum(x[i, n+1, k] for i in V) == 1 for k in K)
     m.addConstrs(qsum(x[i, h, k] for i in V) - qsum(x[h, j, k] for j in V) == 0
@@ -107,23 +107,22 @@ def solve_subtour_elim(data: ProblemData, subproblem: int | None):
     next_node = lambda i, k: next(j for j in V if i != j and x[i, j, k].x > 0.5)
 
     def get_path(v: int):
-        path = [0]
+        path = []
         i = 0
         while (i := next_node(i, v)) != n + 1:
-            path.append(i)
-        path.append(i)
+            path.append(i - 1)
+        path.append(i - 1)
         return path
 
     if m.status == GRB.Status.OPTIMAL:
-        print(f"Problem solved, cost: {m.objVal / DISTANCE_GRANULARITY}")
-        for k in x:
-            if x[k].x > 0.5:
-                print(k)
-        print(f"Paths:")
+        cost = m.objVal / DISTANCE_GRANULARITY
+        routes = []
+        print(f"Problem solved, cost: {cost}")
         for k in K:
             p = get_path(k)
             if len(p) > 2:
-                print(get_path(k))
+                routes.append(get_path(k))
+        return ProblemSolution(routes, cost)
     else:
         print("No feasible solution found")
 

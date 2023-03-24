@@ -1,10 +1,11 @@
-from .common import ProblemData, points_to_distance_matrix, MAX_CAPACITY_PER_VEHICLE, MAX_VEHICLES, GRANULARITY, DISTANCE_GRANULARITY
+from .common import ProblemData, points_to_distance_matrix, MAX_CAPACITY_PER_VEHICLE, MAX_VEHICLES, GRANULARITY, \
+    DISTANCE_GRANULARITY, ProblemSolution
 from gurobipy import Model, GRB, quicksum as qsum
 import numpy as np
 from math import ceil, floor
 
 
-def solve_flow_poly(data: ProblemData, subproblem: int | None):
+def solve_flow_poly(data: ProblemData, subproblem: int | None) -> ProblemSolution | None:
     # Index 0 is the starting and ending point
     facilities = data.facilities
     if subproblem is not None:
@@ -53,22 +54,29 @@ def solve_flow_poly(data: ProblemData, subproblem: int | None):
     m.addConstrs(c[j] - c[i] >= w[j] - M*(1-x[i, j]) for i in V for j in V if i != j and j != 0)
     m.addConstrs(c[i] <= max_cap for i in V)
 
-    m.optimize()
+    try:
+        m.optimize()
+    except KeyboardInterrupt:
+        print("Interrupted")
 
     next_nodes = lambda i: [j for j in V if i != j and x[i, j].x > 0.5]
 
     def get_path(i: int):
-        path = [0, i]
+        path = [i - 1]
         while i := next_nodes(i)[0]:
-            path.append(i)
+            path.append(i - 1)
         return path
 
-    if m.status == GRB.Status.OPTIMAL:
-        print(f"Problem solved, cost: {m.objVal / DISTANCE_GRANULARITY}")
-        print([i.x for i in c])
+    if m.status == GRB.Status.OPTIMAL or m.status == GRB.Status.INTERRUPTED:
+        cost = m.objVal / DISTANCE_GRANULARITY
+        routes = []
+        print(f"Problem solved, cost: {cost}")
         start_paths = next_nodes(0)
-        print(f"Paths: {len(start_paths)}")
         for p in start_paths:
-            print(get_path(p))
+            routes.append(get_path(p))
+        # sometimes gurobi does not terminate because it needs memory to free memory, better be safe than sorry
+        print(routes, cost)
+        return ProblemSolution(routes, cost)
     else:
         print("No feasible solution found")
+        return None

@@ -1,5 +1,6 @@
 from .optimize import derive_clients_count, optimize_problem
-from ..common import ProblemData, points_to_distance_matrix, MAX_CAPACITY_PER_VEHICLE, GRANULARITY, DISTANCE_GRANULARITY
+from ..common import ProblemData, points_to_distance_matrix, MAX_CAPACITY_PER_VEHICLE, GRANULARITY, \
+    DISTANCE_GRANULARITY, ProblemSolution
 from .data import Context, CGProblemData, Route, ExploreDir
 from .branchnprice import branchnprice, debug_explore
 
@@ -64,7 +65,7 @@ def initial_sol(ctx: Context) -> List[Route]:
     return routes
 
 
-def solve_colgen(data: ProblemData, subproblem: int | None, debug: bool=False, explore_dir: ExploreDir = 'mixed'):
+def solve_colgen(data: ProblemData, subproblem: int | None, debug: bool=False, explore_dir: ExploreDir = 'mixed') -> ProblemSolution | None:
     facilities = data.facilities
 
     # Limit problem (if asked)
@@ -132,16 +133,24 @@ def solve_colgen(data: ProblemData, subproblem: int | None, debug: bool=False, e
 
     if ctx.best_sol is None:
         print("No feasible solution found, should be impossible")
-    else:
-        m = ctx.best_sol.model
+        if debug:
+            debug_explore(ctx)
+        return None
+    m = ctx.best_sol.model
 
-        x = m.getVars()[2:]
-        print(ctx.best_sol.history)
-        print(f"Problem solved, cost: {m.objVal / DISTANCE_GRANULARITY}")
-        print(f"Paths:")
-        for v in x:
-            if v.x > 0.00001:
-                print(v.x, ctx.routes[v.VarName].path, v.VarName)
+    x = m.getVars()[2:]
+
+    routes = []
+    cost = m.objVal / DISTANCE_GRANULARITY
+    print(f"Problem solved, cost: {cost}")
+    print(f"Paths:")
+    for v in x:
+        if v.x > 0.00001:
+            routes.append(
+                [p - 1 for p in ctx.routes[v.VarName].path[1:-1]]
+            )
+            # print(v.x, ctx.routes[v.VarName].path, v.VarName)
 
     if debug:
         debug_explore(ctx)
+    return ProblemSolution(routes, cost)
