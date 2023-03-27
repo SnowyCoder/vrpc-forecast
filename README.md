@@ -23,7 +23,7 @@ The project main focus is solving the Vehicle Routing Problem with Capacity cons
 
 ## Column Generation Implementation
 To create the column generation implementation we partially used the paper from "Desrochers, Desrosiers and Solomon, 1992".
-You can find the code in src/solver/colgen, there is also a debug mode used to explore the Branch&Price tree, you can
+You can find the code in src/solver/colgen, there is also a debug mode used to explore the Branch and Price tree, you can
 explore it using the `--debug` flag
 
 ## CLI Example
@@ -37,6 +37,6 @@ The project uses [Poetry](https://python-poetry.org/) to have a reproducible wor
 If you have poetry you can use `poetry update && poetry shell` to install the used requirements and open an usable
 virtual environment.
 
-## Status: In Development
-This is a development version, it still has (lots) of bugs and inefficient code, especially the column-generation method.
+## Status: Delivered
+This project is stable and does not seem to have any obvious bugs, the author does not take any responsability about its use nor about the generated data.
 Run at your own risk.

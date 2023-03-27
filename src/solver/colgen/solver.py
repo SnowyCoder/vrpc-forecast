@@ -142,7 +142,7 @@ def solve_colgen(data: ProblemData, subproblem: int | None, debug: bool=False, e
 
     routes = []
     cost = m.objVal / DISTANCE_GRANULARITY
-    print(f"Problem solved, cost: {cost}")
+    print(f"Problem solved, cost: {cost}, generated columns: {len(ctx.routes)}, branches: {ctx.branches}")
     print(f"Paths:")
     for v in x:
         if v.x > 0.00001:

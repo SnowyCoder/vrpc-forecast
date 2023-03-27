@@ -6,7 +6,7 @@ Of particular note is that while most formulations are independent of the precis
 
 \section{Polynomial model}
 \label{polynomial-model}
-The first method that we explored is a polynomial approach, which was the most straightforward solution. Despite its simplicity, this method is effective at identifying a feasible route for delivering ingredients to the various delivery centers.
+The first method that we explored is a polynomial approach, which is the most straightforward solution. This particular formulation is a modified version of the polynomial TSP solution explained in the lectures. Despite its simplicity, this method is effective at identifying a feasible route for delivering ingredients to the various delivery centers.
 
 \begin{align*}
     \min \quad & \sum_{i,j}{d_{i,j}x_{i,j}}\\
@@ -24,11 +24,11 @@ The first method that we explored is a polynomial approach, which was the most s
 Where $w_i$ is the material need of node $i$, $d_{i,j}$ is the distance from node $i$ to node $j$, $V$ is the set of nodes and $A$ is the set of arcs. The variables are: $x_{i, j}$ that is 1 if and only if the arc from node $i$ to node $j$ is selected, and $c_i$ that contains the accumulated capacity at node $i$.
 The model minimizes the total distance, constraints 1, 2 and 3 are the flow constraints, while inequality 4, 5 and 6 constrain the capacity of the vehicles.
 
-Constriant 5 activates when the arc $(i, j)$ is selected and constrains the capacity of the new node, as the inequality can be rewritten as $c_j >= c_i + w_j$. When node capacities are positive this inequality also imposes cycle elimination as $c_i$ must be strictly monotonic along the path.
+Constraint 5 activates when the arc $(i, j)$ is selected and constrains the capacity of the new node, as the inequality can be rewritten as $c_j >= c_i + w_j$. When node capacities are positive this inequality also imposes cycle elimination as $c_i$ must be strictly monotonic along the path.
 
 \section{Subtour elimination model}
 \label{subtour-elimination-model}
-The second tested model is based on subtour elimination, also known as row generation. The general idea is that the model has a polinomial number of variables but an exponential number of constraints that are added incrementally during the exploration of the solution space. Usually the solution does not need to generate too many constraints, rendering this methodology usually faster than a polynomial formulation.
+The second tested model is based on subtour elimination, also known as row generation. The general idea is that the model has a polynomial number of variables but an exponential number of constraints that are added incrementally during the exploration of the solution space. Usually the solution does not need to generate too many constraints, rendering this methodology usually faster than a polynomial formulation.
 
 % TODO: multiple alignment (to align foralls)?
 \begin{align*}
@@ -51,7 +51,7 @@ The second tested model is based on subtour elimination, also known as row gener
 
 Here the nodes are a bit different than the previous model, node $0$ and $n+1$ are the depot node, and while $C$ is the set of customers ($n = |C|$), $V$ is the set of all nodes ($V = C \cup \{0, n+1\}$). The other used set is $K$ the set of usable vehicles, while $Q$, as in the other models is the maximum capacity for each vehicle. In this formulation we have only one three-dimensional variable, $x_{i,j,k}$ that is 1 if and only if vehicle $k$ uses the arc $(i,j)$.
 
-The first three ineqaulities are just to remove unwanted arcs, 1 is to avoid 1-cycles, 2 and 3 remove cycles in and out of source and sink nodes. Constraint 4 allows each customer to be visited and cosntraint 5 limits the capacity for each vehicle. Flow constraints are enforced through ineqaulities 6 to 8.
+The first three inequalities are just to remove unwanted arcs, 1 is to avoid 1-cycles, 2 and 3 remove cycles in and out of source and sink nodes. Constraint 4 allows each customer to be visited and constraint 5 limits the capacity for each vehicle. Flow constraints are enforced through inequalities 6 to 8.
 
 The last constraint purpose is to remove cycles in each tour, but needs to be enforced for each possible cycle. To render this efficient we relax the problem and only add the constraints encountered when the problem solution contains cycles.
 
@@ -79,7 +79,7 @@ The variable $x_r$ is 1 iff the route is used, $X_d$ is the number of vehicles u
 
 Constraint 1 requires all customers to be statisfied, while constraints 2 and 3 constrain the variables $X_c$ and $X_d$ to adhere to their definition, these are useful in the Branch and Price phase.
 
-To resolve this problem without using an exponential number of variables, the system is first relaxed of its integrality constraints, and is then initialized with a feasible set of variables. After that the linear problem is solved and the dual variables are used to find better routes to add as variabels. This process is repeated until an optimal solution for the relaxed problem is found. To then find the integral solution another method called Branch and Price is required.
+To resolve this problem without using an exponential number of variables, the system is first relaxed of its integrality constraints, and is then initialized with a feasible set of variables. After that the linear problem is solved and the dual variables are used to find better routes to add as variables. This process is repeated until an optimal solution for the relaxed problem is found. To then find the integral solution another method called Branch and Price is required.
 
 \subsection{Initial routes}
 There are various strategies to select initial routes, one possible solution is to select the Identity matrix, interpreted as using one vehicle to visit each customer, while this does work it leads to inefficient first steps and additional subproblem cycles.
@@ -113,7 +113,7 @@ In this implementation the initial routes are selected with a custom heuristic t
 \subsection{Subproblem}
 The used subproblem is a variation of what was described in the original paper, we revisited it to remove the time constraints and to be more intuitive.
 
-Given the reduced costs of each arc: $\overline{c}_{i,j} = (1 - \pi_c)c_{i,j} - \pi_i$ where $\pi_0 = \pi_d$, the subproblem requires to find negative cost routes (from the depot back to the depot) with capacity constraints traversing the graph. The graph can also contain negative loop cycles, making the problem NP hard in the strong sense.
+Given the reduced costs of each arc: $\overline{c}_{i,j} = (1 - \pi_c)c_{i,j} - \pi_i$ where $\pi_0 = \pi_d$, the subproblem requires finding negative cost routes (from the depot back to the depot) with capacity constraints traversing the graph. The graph can also contain negative loop cycles, making the problem NP hard in the strong sense.
 
 Our solution is a simple Dynamic Programming algorithm similar to the Pulling Algorithm described in the paper, of complexity $\mathbb{O}(Q^2N^2)$
 \begin{align*}
@@ -142,9 +142,9 @@ A simple interpretation of this algorithm is that $C_i(q)$ offers the best route
 
 The subproblem is a critical component of the algorithm as it is where the model will spend most of the time, to have faster iterations we implemented the subproblem using Cython~\cite{behnel2011cython}, while all of the other project is developed using Python. This alone has achieved a 10x speedup for the solution of every subproblem.
 
-Since the complexity of the subproblem higly depends on $Q$, the maximum capacity for each vehicle, as a speed optimization we offer a capacity granularity, by having less granularity the results are less precise but the subproblem speed decreases quadratically. All of the results have a capacity granularity of 1000 Kg per customer where $Q = 10000Kg$.
+Since the complexity of the subproblem highly depends on $Q$, the maximum capacity for each vehicle, as a speed optimization we offer a capacity granularity, by having less granularity the results are less precise but the subproblem speed decreases quadratically. All the results have a capacity granularity of 1000 Kg per customer where $Q = 10000Kg$.
 
 \subsection{Branch and Price}
-The Branch and Price algorithm is the same as described in the original algorithm, we implemented some optimizations to deduplicate paths and other minor implementation details. The exploration direction in the algorithm is parametrized but by default a mixed exploration is selected as it quickly arrives at an integral solution and it keeps the number of unexplored nodes comparatively low.
+The Branch and Price algorithm is the same as described in the original algorithm, we implemented some optimizations to de-duplicate paths and other minor implementation details. The exploration direction in the algorithm is parametrized but by default a mixed exploration is selected as it quickly arrives at an integral solution, and it keeps the number of unexplored nodes comparatively low.
 
 Developing a Branch and Price technique is quite error-prone for a student, as such we integrated a debug mode that enables exploration of the Branch and Price tree after the optimal solution has been found, keeping track of the Gurobi model and added constraints. This online debugging strategy has been a helpful way to locate and remove multiple coding mistakes.

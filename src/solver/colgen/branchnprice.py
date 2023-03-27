@@ -211,5 +211,3 @@ def branch(ctx: Context, node: Node) -> List[Node] | None:
     n1.fix_arc(ctx, selected_arc, False)
     n2.fix_arc(ctx, selected_arc, True)
     return [n1, n2]
-
-
